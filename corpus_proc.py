@@ -26,7 +26,7 @@ class WordDictionary:
         return self.conn.execute(query, (stress, label)).fetchall()
 
 
-def generate_dictionary(corpus_zip, min_samples, out_path: str="corpus/dictionary.db", save_per: int=100000, update_per:int=10000):
+def generate_dictionary(corpus_txt: list[str], min_samples: int, out_path: str="corpus/dictionary.db", save_per: int=100000, update_per:int=10000):
     """
     generates a dictionary of words, stresses, and possible labels from a corpus.
     saves to a json file.
@@ -37,11 +37,10 @@ def generate_dictionary(corpus_zip, min_samples, out_path: str="corpus/dictionar
 
     counter = 0
 
-    for line in corpus_zip:
-        line = json.loads(line.strip().lower())['s']
-        line = line.replace(".", "").replace(",", "").replace("(", "").replace(")", "")
+    for line in corpus_txt:
 
-        doc = nlp(line)
+        stripped_line = strip_string(line, ".,()-;[]?!/*")
+        doc = nlp(stripped_line)
 
         for token in doc:
             if token.text in dictionary:
@@ -66,15 +65,16 @@ def generate_dictionary(corpus_zip, min_samples, out_path: str="corpus/dictionar
             print(str(counter) + " done")
 
         if counter >= min_samples:
-            save_dict(dictionary, conn, cur)
             break
 
         if counter % save_per == 0:
             save_dict(dictionary, conn, cur)
             conn.close()
 
+    save_dict(dictionary, conn, cur)
 
-def generate_dataset(corpus_zip, min_samples: int=1000000, out_path: str="corpus/stress.csv"):
+
+def generate_dataset(corpus_txt: list[str], min_samples: int=1000000, out_path: str="corpus/stress.csv"):
     """
     generates a csv of data points associating stress patterns, durations, and labels.
     """
@@ -86,11 +86,10 @@ def generate_dataset(corpus_zip, min_samples: int=1000000, out_path: str="corpus
 
     sample_idx = 0
 
-    for line in corpus_zip:
-        line = json.loads(line.strip().lower())['s']
-        line = line.replace(".", "").replace(",", "").replace("(", "").replace(")", "")
+    for line in corpus_txt:
 
-        doc = nlp(line)
+        stripped_line = strip_string(line, ".,()-;[]?!/*")
+        doc = nlp(stripped_line)
 
         if any([token.text[0] == '\'' for token in doc]):
             continue
@@ -113,7 +112,7 @@ def generate_dataset(corpus_zip, min_samples: int=1000000, out_path: str="corpus
 
                 stresses = temp_stress
                 durations = temp_duration
-
+                
             stresses = ["".join(pattern) for pattern in stresses]
 
             labels = " ".join([token.pos_ for token in doc])
@@ -124,7 +123,7 @@ def generate_dataset(corpus_zip, min_samples: int=1000000, out_path: str="corpus
         
         if sample_idx > min_samples:
             break
-        
+    
     fp.close()
 
 
@@ -181,3 +180,7 @@ def make_database(out_path: str="corpus/dictionary.db"):
     # Create tables
     cur.executescript(dict_database_schema)
     return conn, cur
+
+def strip_string(string: str, rm_chars: str):
+    """strips string and removes rm_chars"""
+    return string.lower().translate({ord(c): None for c in rm_chars})
