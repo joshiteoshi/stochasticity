@@ -1,24 +1,24 @@
 # stochasticity
 
-This is the repository for the *stochasticity*, a computational poetry project.
+This is the repository for *stochasticity*, a computational poetry project.
 
 This code was written to solve a very stupid problem: given an English word stress sequence, can we segment it, label the segments, and randomly fill the words to create syntactically correct nonsense poetry?
 If that seems like an exercise in futility, you are 100% correct.
 Here are some excerpts from *stochasticity*:
 
-> between untold compute or ring
-> aloft a rate between
-> the lightning than the none was fear
+> between untold compute or ring<br/>
+> aloft a rate between<br/>
+> the lightning than the none was fear<br/>
 > and said him out this jaw
 >
-> and waters in that price with void
-> beyond enough event
-> behind a weight beside are found
+> and waters in that price with void<br/>
+> beyond enough event<br/>
+> behind a weight beside are found<br/>
 > a lyrics live with wit
 >
-> or as a wings together die
-> that anger like a boot
-> with which good match or a good do
+> or as a wings together die<br/>
+> that anger like a boot<br/>
+> with which good match or a good do<br/>
 > a feel in meet to this
 
 Still interested in running this for some reason?
